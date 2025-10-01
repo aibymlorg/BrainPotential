@@ -8,7 +8,7 @@ interface WelcomeScreenProps {
 }
 
 // QR Code for https://brain-potential.vercel.app
-const QR_CODE_DATA_URL = '/Brain_vs_AI-1024.jpeg';
+const QR_CODE_DATA_URL = 'Brain_vs_AI-1024.jpeg';
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
   const [selectedCategory, setSelectedCategory] = useState<FilterCategory>('all');
@@ -87,9 +87,9 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
         </div>
       </div>
       <div className="flex-shrink-0 text-center mt-8 md:mt-0">
-        <p className="text-gray-400 mb-2 text-sm max-w-[150px] mx-auto">掃描QR碼或點擊以在 Google AI Studio 了解更多資訊</p>
-        <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer" className="inline-block p-2 bg-white rounded-lg transition-transform transform hover:scale-105">
-          <img src={QR_CODE_DATA_URL} alt="QR Code for Google AI Studio" className="w-32 h-32" />
+        <p className="text-gray-400 mb-2 text-sm max-w-[150px] mx-auto">掃描QR碼或點擊以在 https://brain-potential.vercel.app 進行遊戲</p>
+        <a href="https://brain-potential.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-block p-2 bg-white rounded-lg transition-transform transform hover:scale-105">
+          <img src='Brain_vs_AI-1024.jpeg' alt="QR Code for the Game" className="w-32 h-32" />
         </a>
       </div>
     </div>
