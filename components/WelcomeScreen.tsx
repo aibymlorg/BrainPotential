@@ -8,7 +8,7 @@ interface WelcomeScreenProps {
 }
 
 // QR Code for https://brain-potential.vercel.app
-const QR_CODE_DATA_URL = 'Brain_vs_AI-1024.jpeg;base64';
+const QR_CODE_DATA_URL = '/Brain_vs_AI-1024.jpeg';
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
   const [selectedCategory, setSelectedCategory] = useState<FilterCategory>('all');
