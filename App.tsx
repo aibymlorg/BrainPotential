@@ -117,14 +117,16 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 font-sans flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-900 font-sans flex flex-col items-center p-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
         <div className="absolute top-0 left-0 w-72 h-72 bg-cyan-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute bottom-0 right-0 w-72 h-72 bg-fuchsia-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
-        <div className="z-10 w-full max-w-4xl mx-auto">
-            {renderGameState()}
-        </div>
+        <main className="w-full max-w-4xl flex-grow flex flex-col justify-center">
+            <div className="z-10 w-full">
+                {renderGameState()}
+            </div>
+        </main>
 
         {feedback?.show && (
             <FeedbackModal
@@ -133,6 +135,11 @@ function App() {
                 onNext={handleNext}
             />
         )}
+        
+        <footer className="w-full max-w-4xl z-10 text-xs text-gray-500 flex justify-between items-center py-2 shrink-0">
+            <span>@copyright aibyml.com</span>
+            <span className="font-display tracking-wider">POWERED BY GEMINI</span>
+        </footer>
     </div>
   );
 }
