@@ -1,11 +1,11 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import WelcomeScreen from './components/WelcomeScreen';
 import GameScreen from './components/GameScreen';
 import SummaryScreen from './components/SummaryScreen';
 import FeedbackModal from './components/FeedbackModal';
-import { CHALLENGES } from './constants';
+import { CHALLENGES, DIFFICULTY_LEVELS } from './constants';
 import type { Challenge } from './types';
-import { GameState, Target } from './types';
+import { GameState, Target, Difficulty, ChallengeCategory } from './types';
 
 function App() {
   const [gameState, setGameState] = useState<GameState>(GameState.Welcome);
@@ -14,20 +14,34 @@ function App() {
   const [feedback, setFeedback] = useState<{ show: boolean; correct: boolean; explanation: string } | null>(null);
   const [shuffledChallenges, setShuffledChallenges] = useState<Challenge[]>([]);
 
-  const shuffleChallenges = useCallback(() => {
-    setShuffledChallenges([...CHALLENGES].sort(() => Math.random() - 0.5));
-  }, []);
+  const startGame = useCallback((difficulty: Difficulty) => {
+    const numChallenges = DIFFICULTY_LEVELS[difficulty];
+    
+    let challengesToSampleFrom: Challenge[];
 
-  useEffect(() => {
-    shuffleChallenges();
-  }, [shuffleChallenges]);
+    if (difficulty === Difficulty.Easy) {
+      // Easy mode exclusively uses "Fact" challenges
+      challengesToSampleFrom = CHALLENGES.filter(c => c.category === ChallengeCategory.Fact);
+    } else {
+      // Medium and Hard use all challenges
+      challengesToSampleFrom = [...CHALLENGES];
+    }
+    
+    const availableChallengesCount = challengesToSampleFrom.length;
 
-  const startGame = useCallback(() => {
+    const gameChallenges = challengesToSampleFrom
+      .sort(() => Math.random() - 0.5)
+      .slice(0, Math.min(numChallenges, availableChallengesCount));
+    
+    setShuffledChallenges(gameChallenges);
     setScore(0);
     setCurrentChallengeIndex(0);
-    shuffleChallenges();
     setGameState(GameState.Playing);
-  }, [shuffleChallenges]);
+  }, []);
+
+  const handleReturnToHome = useCallback(() => {
+    setGameState(GameState.Welcome);
+  }, []);
 
   const handleAnswer = useCallback((challengeId: number, droppedOn: Target) => {
     const challenge = shuffledChallenges.find(c => c.id === challengeId);
@@ -70,7 +84,7 @@ function App() {
           <SummaryScreen
             score={score}
             total={shuffledChallenges.length}
-            onPlayAgain={startGame}
+            onPlayAgain={handleReturnToHome}
           />
         );
       case GameState.Welcome:
