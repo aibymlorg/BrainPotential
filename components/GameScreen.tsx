@@ -9,9 +9,10 @@ interface GameScreenProps {
   challenge: Challenge;
   onAnswer: (challengeId: number, droppedOn: Target) => void;
   progress: { current: number; total: number };
+  successTarget: Target | null;
 }
 
-const GameScreen: React.FC<GameScreenProps> = ({ challenge, onAnswer, progress }) => {
+const GameScreen: React.FC<GameScreenProps> = ({ challenge, onAnswer, progress, successTarget }) => {
   const [isDragging, setIsDragging] = useState(false);
 
   return (
@@ -41,11 +42,13 @@ const GameScreen: React.FC<GameScreenProps> = ({ challenge, onAnswer, progress }
           target={Target.Brain}
           onDrop={onAnswer}
           isDragging={isDragging}
+          isSuccess={successTarget === Target.Brain}
         />
         <DropZone
           target={Target.LLM}
           onDrop={onAnswer}
           isDragging={isDragging}
+          isSuccess={successTarget === Target.LLM}
         />
       </div>
     </div>

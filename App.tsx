@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import WelcomeScreen from './components/WelcomeScreen';
 import GameScreen from './components/GameScreen';
@@ -13,6 +14,7 @@ function App() {
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
   const [feedback, setFeedback] = useState<{ show: boolean; correct: boolean; explanation: string } | null>(null);
   const [shuffledChallenges, setShuffledChallenges] = useState<Challenge[]>([]);
+  const [successTarget, setSuccessTarget] = useState<Target | null>(null);
 
   const startGame = useCallback((difficulty: Difficulty) => {
     const numChallenges = DIFFICULTY_LEVELS[difficulty];
@@ -39,10 +41,6 @@ function App() {
     setGameState(GameState.Playing);
   }, []);
 
-  const handleReturnToHome = useCallback(() => {
-    setGameState(GameState.Welcome);
-  }, []);
-
   const handleAnswer = useCallback((challengeId: number, droppedOn: Target) => {
     const challenge = shuffledChallenges.find(c => c.id === challengeId);
     if (!challenge) return;
@@ -50,6 +48,9 @@ function App() {
     const isCorrect = challenge.target === droppedOn;
     if (isCorrect) {
       setScore(prev => prev + 1);
+      setSuccessTarget(droppedOn);
+    } else {
+      setSuccessTarget(null);
     }
 
     setFeedback({
@@ -61,6 +62,7 @@ function App() {
 
   const handleNext = useCallback(() => {
     setFeedback(null);
+    setSuccessTarget(null);
     if (currentChallengeIndex < shuffledChallenges.length - 1) {
       setCurrentChallengeIndex(prev => prev + 1);
     } else {
@@ -77,6 +79,7 @@ function App() {
             challenge={shuffledChallenges[currentChallengeIndex]}
             onAnswer={handleAnswer}
             progress={{ current: currentChallengeIndex + 1, total: shuffledChallenges.length }}
+            successTarget={successTarget}
           />
         );
       case GameState.Summary:
@@ -84,7 +87,7 @@ function App() {
           <SummaryScreen
             score={score}
             total={shuffledChallenges.length}
-            onPlayAgain={handleReturnToHome}
+            onStartNewGame={startGame}
           />
         );
       case GameState.Welcome:
