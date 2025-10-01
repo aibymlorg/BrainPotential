@@ -14,6 +14,8 @@ export enum ChallengeCategory {
   UseCase = 'use_case',
 }
 
+export type FilterCategory = ChallengeCategory | 'all';
+
 export interface Challenge {
   id: number;
   text: string;

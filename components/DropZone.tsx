@@ -7,10 +7,9 @@ interface DropZoneProps {
   target: Target;
   onDrop: (challengeId: number, droppedOn: Target) => void;
   isDragging: boolean;
-  isSuccess: boolean;
 }
 
-const DropZone: React.FC<DropZoneProps> = ({ target, onDrop, isDragging, isSuccess }) => {
+const DropZone: React.FC<DropZoneProps> = ({ target, onDrop, isDragging }) => {
   const [isOver, setIsOver] = useState(false);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -32,7 +31,6 @@ const DropZone: React.FC<DropZoneProps> = ({ target, onDrop, isDragging, isSucce
     icon: isBrain ? <BrainIcon className="w-16 h-16 mb-4 text-fuchsia-400" /> : <LlmIcon className="w-16 h-16 mb-4 text-cyan-400" />,
     borderColor: isBrain ? 'border-fuchsia-500' : 'border-cyan-500',
     hoverColor: isBrain ? 'border-fuchsia-300 bg-fuchsia-500/10 shadow-glow-fuchsia' : 'border-cyan-300 bg-cyan-500/10 shadow-glow-cyan',
-    animationClass: isBrain ? 'animate-pulse-fuchsia' : 'animate-pulse-cyan',
   };
 
   return (
@@ -45,7 +43,6 @@ const DropZone: React.FC<DropZoneProps> = ({ target, onDrop, isDragging, isSucce
         ${config.borderColor}
         ${isOver ? config.hoverColor : 'bg-gray-900/50'}
         ${isDragging ? 'opacity-100' : 'opacity-70'}
-        ${isSuccess ? config.animationClass : ''}
       `}
       style={{ minHeight: '200px' }}
     >

@@ -1,11 +1,10 @@
-
 import React, { useState, useCallback } from 'react';
 import WelcomeScreen from './components/WelcomeScreen';
 import GameScreen from './components/GameScreen';
 import SummaryScreen from './components/SummaryScreen';
 import FeedbackModal from './components/FeedbackModal';
 import { CHALLENGES, DIFFICULTY_LEVELS } from './constants';
-import type { Challenge } from './types';
+import type { Challenge, FilterCategory } from './types';
 import { GameState, Target, Difficulty, ChallengeCategory } from './types';
 
 function App() {
@@ -14,19 +13,24 @@ function App() {
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
   const [feedback, setFeedback] = useState<{ show: boolean; correct: boolean; explanation: string } | null>(null);
   const [shuffledChallenges, setShuffledChallenges] = useState<Challenge[]>([]);
-  const [successTarget, setSuccessTarget] = useState<Target | null>(null);
+  const [hintUsed, setHintUsed] = useState(false);
+  const [isHintVisible, setIsHintVisible] = useState(false);
 
-  const startGame = useCallback((difficulty: Difficulty) => {
+  const startGame = useCallback((difficulty: Difficulty, category: FilterCategory) => {
     const numChallenges = DIFFICULTY_LEVELS[difficulty];
     
     let challengesToSampleFrom: Challenge[];
 
     if (difficulty === Difficulty.Easy) {
-      // Easy mode exclusively uses "Fact" challenges
+      // Easy mode exclusively uses "Fact" challenges, overriding any category filter.
       challengesToSampleFrom = CHALLENGES.filter(c => c.category === ChallengeCategory.Fact);
     } else {
-      // Medium and Hard use all challenges
-      challengesToSampleFrom = [...CHALLENGES];
+      // Medium and Hard respect the category filter
+      if (category === 'all') {
+        challengesToSampleFrom = [...CHALLENGES];
+      } else {
+        challengesToSampleFrom = CHALLENGES.filter(c => c.category === category);
+      }
     }
     
     const availableChallengesCount = challengesToSampleFrom.length;
@@ -39,6 +43,12 @@ function App() {
     setScore(0);
     setCurrentChallengeIndex(0);
     setGameState(GameState.Playing);
+    setHintUsed(false);
+    setIsHintVisible(false);
+  }, []);
+
+  const handleReturnToHome = useCallback(() => {
+    setGameState(GameState.Welcome);
   }, []);
 
   const handleAnswer = useCallback((challengeId: number, droppedOn: Target) => {
@@ -48,9 +58,6 @@ function App() {
     const isCorrect = challenge.target === droppedOn;
     if (isCorrect) {
       setScore(prev => prev + 1);
-      setSuccessTarget(droppedOn);
-    } else {
-      setSuccessTarget(null);
     }
 
     setFeedback({
@@ -62,7 +69,7 @@ function App() {
 
   const handleNext = useCallback(() => {
     setFeedback(null);
-    setSuccessTarget(null);
+    setIsHintVisible(false);
     if (currentChallengeIndex < shuffledChallenges.length - 1) {
       setCurrentChallengeIndex(prev => prev + 1);
     } else {
@@ -70,16 +77,29 @@ function App() {
     }
   }, [currentChallengeIndex, shuffledChallenges.length]);
 
+  const handleUseHint = useCallback(() => {
+    if (!hintUsed) {
+      setHintUsed(true);
+      setIsHintVisible(true);
+    }
+  }, [hintUsed]);
+
   const renderGameState = () => {
     switch (gameState) {
       case GameState.Playing:
-        if (shuffledChallenges.length === 0) return null;
+        if (shuffledChallenges.length === 0) {
+            // If no challenges match the filter, go directly to summary
+            setGameState(GameState.Summary);
+            return null;
+        }
         return (
           <GameScreen
             challenge={shuffledChallenges[currentChallengeIndex]}
             onAnswer={handleAnswer}
             progress={{ current: currentChallengeIndex + 1, total: shuffledChallenges.length }}
-            successTarget={successTarget}
+            hintUsed={hintUsed}
+            isHintVisible={isHintVisible}
+            onUseHint={handleUseHint}
           />
         );
       case GameState.Summary:
@@ -87,7 +107,7 @@ function App() {
           <SummaryScreen
             score={score}
             total={shuffledChallenges.length}
-            onStartNewGame={startGame}
+            onPlayAgain={handleReturnToHome}
           />
         );
       case GameState.Welcome:
